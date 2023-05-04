@@ -14,7 +14,6 @@ void imprimirMatriz(vector<vector<double>>& matriz) {
     }
 }
 
-
 vector<vector<double>> decomposicaoCholesky(vector<vector<double>>& A, vector<vector<double>>& L, int n) {
     // Calcular a decomposição de Cholesky
     for (int i = 0; i < n; i++) {
@@ -55,6 +54,73 @@ void decomposicaoLU(vector<vector<double>>& A, vector<vector<double>>& L, vector
     }
 
 }
+
+
+// Função que calcula a solução do sistema linear Ax = B usando o método iterativo de Jacobi
+vector<double> jacobi(vector<vector<double>>& A, vector<double>& B, int n, double tol, int maxIter) {
+    vector<double> X(n, 0.0);
+    vector<double> Xnew(n, 0.0);
+    int k = 0;
+    double erro = tol + 1.0;
+    while (erro > tol && k < maxIter) {
+        for (int i = 0; i < n; i++) {
+            double soma = 0.0;
+            for (int j = 0; j < n; j++) {
+                if (j != i) {
+                    soma += A[i][j] * X[j];
+                }
+            }
+            Xnew[i] = (B[i] - soma) / A[i][i];
+        }
+        erro = 0.0;
+        for (int i = 0; i < n; i++) {
+            erro += pow(Xnew[i] - X[i], 2);
+        }
+        erro = sqrt(erro);
+        X = Xnew;
+        k++;
+    }
+    if (k == maxIter) {
+        cout << "O método iterativo de Jacobi não convergiu em " << maxIter << " iterações!" << endl;
+    } else {
+        cout << "O método iterativo de Jacobi convergiu em " << k << " iterações!" << endl;
+    }
+    return X;
+}
+
+
+vector<double> gauss_seidel(vector<vector<double>> A, vector<double> B, int n, double tol, int maxIter) {
+    vector<double> X(n, 0); // estimativa inicial da solução
+    int iter = 0; // número de iterações
+    double error = tol + 1; // erro inicial (qualquer valor maior que tol)
+
+    while (error > tol && iter < maxIter) {
+        error = 0;
+        for (int i = 0; i < n; i++) {
+            double soma = 0;
+            for (int j = 0; j < n; j++) {
+                if (i != j) {
+                    soma += A[i][j] * X[j];
+                }
+            }
+            double Xnew = (B[i] - soma) / A[i][i]; // nova estimativa da solução
+            error += abs(Xnew - X[i]); // atualiza o erro
+            X[i] = Xnew; // atualiza a estimativa da solução
+        }
+        iter++; // incrementa o número de iterações
+    }
+
+    // verifica se o método convergiu ou não
+    if (iter == maxIter && error > tol) {
+        cerr << "O método de Gauss-Seidel não convergiu em " << maxIter << " iterações." << endl;
+    }
+
+    return X;
+}
+
+
+
+
 
 // Função para resolver o sistema linear Ax = b usando a decomposição LU
 vector<double> resolverSistemaLU(vector<vector<double>>& A, vector<vector<double>>& L, vector<vector<double>>& U, vector<double>& b, int n) {
