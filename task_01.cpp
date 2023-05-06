@@ -3,6 +3,14 @@
 #include <cmath>
 using namespace std;
 
+
+void imprimirVetor(vector<double>&x){
+    cout << "A solução do sistema é:\n";
+    for (int i = 0; i < x.size(); i++) {
+        cout << "x" << i + 1 << " = " << x[i] << "\n";
+    }
+}
+
 void imprimirMatriz(vector<vector<double>>& matriz) {
     int n = matriz.size();
     int m = matriz[0].size();
@@ -55,29 +63,61 @@ void decomposicaoLU(vector<vector<double>>& A, vector<vector<double>>& L, vector
 
 }
 
+bool converge(vector<vector<double>>&A){
+    int n = A.size();
+    double soma_linha, soma_coluna;
+    for (int i = 0; i < n; i++){
+        soma_linha = 0.0;
+        soma_coluna = 0.0;
 
+        for(int j = 0; j < n; j++ ){
+
+            if(j == i){
+                continue;
+            }
+
+            soma_linha += abs(A[i][j]);
+            soma_coluna += abs(A[j][i]);
+        }
+
+        if(soma_linha > abs(A[i][i]) or soma_coluna > abs(A[i][i]) ){
+            return false;
+        }
+    }
+    return true;
+}
 // Função que calcula a solução do sistema linear Ax = B usando o método iterativo de Jacobi
-vector<double> jacobi(vector<vector<double>>& A, vector<double>& B, int n, double tol, int maxIter) {
-    vector<double> X(n, 0.0);
-    vector<double> Xnew(n, 0.0);
+vector<double> jacobi(vector<vector<double>>& A, vector<double>& B, double &tol, int &maxIter) {
+    if(!converge(A)){
+        cerr << "Matriz não converge !!" << endl;
+        return;
+    }
+
+    int n = A.size();
     int k = 0;
-    double erro = tol + 1.0;
-    while (erro > tol && k < maxIter) {
+    vector<double> Xold(n, 1.0);
+    vector<double> Xnew(n, 0.0);
+    double numerador,denominador;
+    double residuo = tol + 1.0;
+
+    while (residuo > tol && k < maxIter) {
         for (int i = 0; i < n; i++) {
             double soma = 0.0;
             for (int j = 0; j < n; j++) {
                 if (j != i) {
-                    soma += A[i][j] * X[j];
+                    soma += A[i][j] * Xold[j];
                 }
             }
             Xnew[i] = (B[i] - soma) / A[i][i];
         }
-        erro = 0.0;
+
+        residuo, numerador, denominador = 0.0;
         for (int i = 0; i < n; i++) {
-            erro += pow(Xnew[i] - X[i], 2);
+            numerador += pow(Xnew[i] - Xold[i], 2);
+            denominador += pow(Xnew[i],2);
         }
-        erro = sqrt(erro);
-        X = Xnew;
+        residuo = sqrt(numerador)/sqrt(denominador);
+        Xold = Xnew;
         k++;
     }
     if (k == maxIter) {
@@ -85,38 +125,48 @@ vector<double> jacobi(vector<vector<double>>& A, vector<double>& B, int n, doubl
     } else {
         cout << "O método iterativo de Jacobi convergiu em " << k << " iterações!" << endl;
     }
-    return X;
+    return Xnew;
 }
 
 
-vector<double> gauss_seidel(vector<vector<double>> A, vector<double> B, int n, double tol, int maxIter) {
-    vector<double> X(n, 0); // estimativa inicial da solução
+vector<double> gauss_seidel(vector<vector<double>> &A, vector<double> &B, double &tol, int &maxIter) {
+    int n = A.size();
     int iter = 0; // número de iterações
-    double error = tol + 1; // erro inicial (qualquer valor maior que tol)
+    vector<double> Xold(n, 1);// estimativa inicial da solução
+    vector<double> Xnew(n, 0); 
+    double residuo = tol + 1; // residuo inicial (qualquer valor maior que tol)
+    double numerador,denominador;
 
-    while (error > tol && iter < maxIter) {
-        error = 0;
+    while (residuo > tol && iter < maxIter) {
+        residuo, numerador, denominador = 0.0;
         for (int i = 0; i < n; i++) {
             double soma = 0;
-            for (int j = 0; j < n; j++) {
-                if (i != j) {
-                    soma += A[i][j] * X[j];
-                }
+            for (int j = 0; j <= i-1; j++) {
+                    soma += A[i][j] * Xnew[j];
             }
-            double Xnew = (B[i] - soma) / A[i][i]; // nova estimativa da solução
-            error += abs(Xnew - X[i]); // atualiza o erro
-            X[i] = Xnew; // atualiza a estimativa da solução
-        }
-        iter++; // incrementa o número de iterações
-    }
 
+            for (int j = i + 1; j < n; j++){
+                soma += A[i][j] * Xold[j];
+            }
+
+            Xnew[i] = (B[i] - soma)/A[i][i];  // nova estimativa da solução
+            numerador += pow(Xnew[i] - Xold[i], 2);
+            denominador += pow(Xnew[i],2);
+            
+            }
+            residuo = sqrt(numerador)/sqrt(denominador);
+            Xold = Xnew; // atualiza a estimativa da solução
+            iter++; // incrementa o número de iterações
+        }
     // verifica se o método convergiu ou não
-    if (iter == maxIter && error > tol) {
+    if (iter == maxIter && residuo > tol) {
         cerr << "O método de Gauss-Seidel não convergiu em " << maxIter << " iterações." << endl;
     }
 
-    return X;
+    return Xnew;
 }
+
+
 
 
 
@@ -204,7 +254,7 @@ int main() {
         // Executa a decomposição LU
         decomposicaoLU(A, L, U, n);
         while (true){
-            cout << "Digite os novoss valores do vetor b:\n";
+            cout << "Digite os valores do vetor b:\n";
             for (int i = 0; i < n; i++) {
                 cin >> b[i];
             }
@@ -231,7 +281,7 @@ int main() {
     else if (ICOD == 2){
         decomposicaoCholesky(A,L,n);
         while (true){
-            cout << "Digite os novoss valores do vetor b:\n";
+            cout << "Digite os valores do vetor b:\n";
             for (int i = 0; i < n; i++) {
                 cin >> b[i];
             }
@@ -250,8 +300,36 @@ int main() {
             }
         }
     }
+
+    else if (ICOD == 3){
+        double tol;
+        int maxIter;
+
+        cout << "Qual a tolerância ? ";
+        cin >> tol;
+
+        cout << "Qual a quantidade máxima de iterações desejada? ";
+        cin >> maxIter;
+
+        x = jacobi(A,b,tol,maxIter);
+        imprimirVetor(x);
+    
+    }
+    else if (ICOD == 4){
+        double tol;
+        int maxIter;
+
+        cout << "Qual a tolerância ? ";
+        cin >> tol;
+
+        cout << "Qual a quantidade máxima de iterações desejada? ";
+        cin >> maxIter;
+
+        x = gauss_seidel(A,b,tol,maxIter);
+        imprimirVetor(x);
+    }
     else {
-        cerr << "ICOD não definido"<<endl;
+        cerr << "ICOD não definido !"<<endl;
         return EXIT_FAILURE;
     }
     

@@ -1,47 +1,15 @@
-# Algebra_Linear
-Códigos de trabalhos práticos da disciplina Álgebra Linear Computacional
-
-
-Digite a ordem da matriz: 4
-Digite os valores da matriz A:
-5
--4
-1
-0
--4
-6
--4
-1
-1
--4
-6
--4
-0
-1
--4
-5
-Digite os valores do vetor b:
--1
-2
-1
-3
-Matriz A: 
-5 -4 1 0 
--4 6 -4 1 
-1 -4 6 -4 
-0 1 -4 5 
-Matriz L: 
-1 0 0 0 
--0.8 1 0 0 
-0.2 -1.14286 1 0 
-0 0.357143 -1.33333 1 
-Matriz U: 
-5 -4 1 0 
-0 2.8 -3.2 1 
-0 0 2.14286 -2.85714 
-0 0 0 0.833333 
-A solução do sistema é:
-x1 = 5.8
-x2 = 10.2
-x3 = 10.8
-x4 = 7.2
+# Trabalho Prático da disciplina Algebra Linear Computacional
+## TASK 01
+### Parte 1
+    Prepare um programa/código computacional (na linguagem de sua preferência) para efetuar a
+    solução de um sistema linear de equações AX = B onde o usuário possa escolher entre os
+    métodos:
+        1. Decomposição LU (ICOD =1); (não há necessidade de programar Pivotamento)
+        2. Decomposição de Cholesky (ICOD =2)
+    Faça este programa de forma que possam ser resolvidos vários vetores B sem que haja
+    necessidade de decomposição da matriz A para cada novo vetor independente.
+### Parte 2
+    De modo semelhante ao exercício anterior, prepare um código computacional considerando os
+    seguintes métodos para solução de um sistema de equações lineares:
+        3. Procedimento iterativo Jacobi (ICOD =3) e
+        4. Procedimento iterativo Gauss-Seidel (ICOD =4).
