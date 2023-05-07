@@ -224,7 +224,6 @@ vector<double> resolverSistemaCholesky(vector<vector<double>>& A, vector<vector<
 
 
 
-
 // Função principal
 int main() {
     int n, ICOD, sair;

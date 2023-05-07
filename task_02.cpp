@@ -4,14 +4,13 @@
 
 using namespace std;
 
-const double EPS = 1e-6; // valor de tolerância para o critério de parada
+double residuo = 0.001; // valor de tolerância para o critério de parada
 
 // função que realiza o produto matriz-vetor
-vector<double> prodMatVec(vector<vector<double>> A, vector<double> x) {
+vector<double> prodMatVec(vector<vector<double>> &A, vector<double> &x) {
     int n = A.size();
-    vector<double> y(n);
+    vector<double> y(n,0);
     for (int i = 0; i < n; i++) {
-        y[i] = 0;
         for (int j = 0; j < n; j++) {
             y[i] += A[i][j] * x[j];
         }
@@ -20,7 +19,7 @@ vector<double> prodMatVec(vector<vector<double>> A, vector<double> x) {
 }
 
 // função que calcula a norma euclidiana de um vetor
-double norma(vector<double> v) {
+double normaEuclidiana(vector<double> v) {
     double s = 0;
     for (double x : v) {
         s += x * x;
@@ -28,14 +27,24 @@ double norma(vector<double> v) {
     return sqrt(s);
 }
 
-// função que divide um vetor por um escalar
-vector<double> divVec(double k, vector<double> v) {
-    int n = v.size();
-    vector<double> w(n);
-    for (int i = 0; i < n; i++) {
-        w[i] = v[i] / k;
+double normaMaiorValor(vector<double> &y){
+    double maior = 0;
+    for (int i = 0; i < y.size(); i++){
+        if (y[i] > maior){
+            maior = y[i];
+        }
     }
-    return w;
+    return maior;
+}
+
+// função que divide um vetor por um escalar
+vector<double> divVec(double &lambda, vector<double>&y) {
+    int n = y.size();
+    vector<double> x(n,0);
+    for (int i = 0; i < y.size(); i++) {
+        x[i] = y[i]/lambda;
+    }
+    return x;
 }
 
 vector<vector<double>> calcMatRot(vector<vector<double>> A, int p, int q) {
@@ -68,16 +77,19 @@ int main() {
             cin >> A[i][j];
         }
     }
-
-    vector<double> x(n, 1); // vetor inicial x
+    int iter = 0;
+    vector<double> x(n, 1);
+    vector<double> y(n,0); // vetor inicial x
     double lambda, lambda_ant = 0; // autovalor atual e autovalor anterior
     do {
-        vector<double> y = prodMatVec(A, x); // y = A*x
         lambda_ant = lambda;
-        lambda = y[0] / x[0]; // autovalor
-        x = divVec(norma(y), y); // autovetor
-    } while (abs(lambda - lambda_ant) > EPS); // critério de parada
-
+        y = prodMatVec(A, x);
+        lambda = normaMaiorValor(y);
+        x = divVec(lambda,y);
+        iter++;
+    } while (abs((lambda - lambda_ant)/lambda) > residuo); // critério de parada
+    
+    cout << "Número de iterações: " << iter << endl;
     cout << "Autovalor: " << lambda << endl;
     cout << "Autovetor: ";
     for (double v : x) {
