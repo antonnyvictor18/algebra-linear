@@ -13,3 +13,9 @@
             seguintes métodos para solução de um sistema de equações lineares:
                 3. Procedimento iterativo Jacobi (ICOD =3) e
                 4. Procedimento iterativo Gauss-Seidel (ICOD =4).
+
+## TASK 02
+    Prepare um programa computacional (na linguagem de sua preferência) para calcular os
+    autovalores e auto-vetores (possíveis) de uma matriz A pelos métodos:
+        1. Método da Potência (ICOD =1);
+        2. Método de Jacobi (ICOD =2). 
