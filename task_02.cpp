@@ -1,10 +1,125 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
-double residuo = 0.001; // valor de tolerância para o critério de parada
+double residuo = 0.0001; // valor de tolerância para o critério de parada
+
+void lerVetor(vector<double> &vetor, int &n, string &arquivo){
+    ifstream fin(arquivo); 
+    char ch;
+    string last_ch = " ";
+    bool negativo = false;
+    int contador, contador2 = 0;
+
+    while(fin.get(ch)){ 
+        if (ch == ' '){
+            if(last_ch == " " or contador2 == 0){
+                contador2++;
+                continue;
+            }
+            else if (last_ch != " "){
+                if (negativo){
+                    last_ch = '-' + last_ch;
+                }
+                
+                vetor[contador] = stod(last_ch);
+                last_ch = ch;
+                negativo = false;
+                contador++;
+                continue;
+            }
+            
+        }
+
+        else if (ch == '-'){
+            negativo =true;
+            continue;
+        }
+
+        else if (ch != ' '){
+            if (last_ch == " "){
+                last_ch = ch;
+                continue;
+            }
+
+            else if (last_ch != " "){
+                last_ch = last_ch + ch;
+                continue;
+            }
+        }
+    }
+    vetor[contador] = stod(last_ch);    
+}
+
+void lerMatriz(vector<vector<double>> &A, int &n, string &arquivo){
+ ifstream fin(arquivo); 
+ char ch;
+ string last_ch = " ";
+ bool negativo = false;
+ int contador, contador2 = 0;
+ vector<double> vetor(n*n,0);
+
+ while(fin.get(ch)){ 
+    if (ch == ' '){
+        if(last_ch == " " or contador2 == 0){
+            contador2++;
+            continue;
+        }
+        else if (last_ch != " "){
+            if (negativo){
+                last_ch = '-' + last_ch;
+            }
+            
+            vetor[contador] = stod(last_ch);
+            last_ch = ch;
+            negativo = false;
+            contador++;
+            continue;
+        }
+        
+    }
+
+    else if (ch == '-'){
+        negativo =true;
+        continue;
+    }
+
+    else if (ch != ' '){
+        if (last_ch == " "){
+            last_ch = ch;
+            continue;
+        }
+
+        else if (last_ch != " "){
+            last_ch = last_ch + ch;
+            continue;
+        }
+        
+
+    }
+
+    }
+
+    vetor[contador] = stod(last_ch);
+    contador = 0;
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            A[i][j] = vetor[contador];
+            contador++;
+        }
+    } 
+}
+
+
+void imprimirVetor(vector<double>&x){
+    cout << "A solução do sistema é:\n";
+    for (int i = 0; i < x.size(); i++) {
+        cout << "x" << i + 1 << " = " << x[i] << "\n";
+    }
+}
 
 void imprimirMatriz(vector<vector<double>>& matriz) {
     int n = matriz.size();
@@ -153,48 +268,49 @@ vector<double> divVec(double &lambda, vector<double>&y) {
 
 
 int main() {
-    int n, ICOD, iter;
-    cout << "Digite a ordem da matriz A: ";
-    cin >> n;
-
+    int ICOD, iter;
+    int n = 10;
+    int sair = 1;
+    string arquivo = "Matriz_A.dat";
     vector<vector<double>> A(n, vector<double>(n));
-    cout << "Digite os elementos da matriz A:" << endl;
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            cin >> A[i][j];
-        }
-    }
 
-    cout << "Escolha o método de resolução (Metodo da Potência -> 1 ou\n Método de Jacobi -> 2):\n";
-    cin >> ICOD;
+    cout << "Lendo a Matriz A:" << endl;
+    lerMatriz(A,n,arquivo);
+    cout << "Matriz A Lida:" << endl;
+    imprimirMatriz(A);
 
-    if (ICOD == 1){
-        iter = 0;
-        vector<double> x(n, 1);
-        vector<double> y(n,0); // vetor inicial x
-        double lambda, lambda_ant = 1; // autovalor atual e autovalor anterior
-        do {
-            lambda_ant = lambda;
-            y = prodMatVec(A, x);
-            lambda = normaMaiorValor(y);
-            x = divVec(lambda,y);
-            iter++;
-        } while (abs((lambda - lambda_ant)/lambda) > residuo); // critério de parada
-        
-        cout << "Número de iterações: " << iter << endl;
-        cout << "Autovalor: " << lambda << endl;
-        cout << "Autovetor: ";
-        for (double v : x) {
-            cout << v << " ";
-        }
-        cout << endl;    
+    while (sair){
+        cout << "Escolha o método de resolução (Metodo da Potência -> 1 ou\n Método de Jacobi -> 2):\n";
+        cin >> ICOD;
+
+        if (ICOD == 1){
+            iter = 0;
+            vector<double> x(n, 1);
+            vector<double> y(n,0); 
+            double lambda, lambda_ant = 1; // autovalor atual e autovalor anterior
+            do {
+                lambda_ant = lambda;
+                y = prodMatVec(A, x);
+                lambda = normaMaiorValor(y);
+                x = divVec(lambda,y);
+                iter++;
+            } while (abs((lambda - lambda_ant)/lambda) > residuo); // critério de parada
+            
+            cout << "Número de iterações: " << iter << endl;
+            cout << "Autovalor: " << lambda << endl;
+            cout << "Autovetor: ";
+            imprimirVetor(x);    
+            }
+
+        else if (ICOD == 2){
+            iter = 0;
+            vector<vector<double>> V(n, vector<double>(n));
+            jacobi(A,V);
+            imprimeAutovaloreeAutovetores(A, V, n);
         }
 
-    else if (ICOD == 2){
-        iter = 0;
-        vector<vector<double>> V(n, vector<double>(n));
-        jacobi(A,V);
-        imprimeAutovaloreeAutovetores(A, V, n);
+        cout << "Digite 0 para encerrar o programa ou 1 para escolher outro método: ";
+        cin >> sair;
     }
     
     return 0;
