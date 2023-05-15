@@ -105,7 +105,7 @@ void rotacaoJacobi(vector<vector<double>>&A, vector<vector<double>>&V, int &p, i
             double Aip = A[i][p];
             double Aiq = A[i][q];
             A[i][p] = Aip*c - Aiq*s;
-            A[p][i] = A[i][p];
+            A[p][i  ] = A[i][p];
             A[i][q] = Aiq*c + Aip*s;
             A[q][i] = A[i][q];
         }

@@ -1,7 +1,115 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <cmath>
 using namespace std;
+
+
+void lerVetor(vector<double> &vetor, int &n, string &arquivo){
+    ifstream fin(arquivo); 
+    char ch;
+    string last_ch = " ";
+    bool negativo = false;
+    int contador, contador2 = 0;
+
+    while(fin.get(ch)){ 
+        if (ch == ' '){
+            if(last_ch == " " or contador2 == 0){
+                contador2++;
+                continue;
+            }
+            else if (last_ch != " "){
+                if (negativo){
+                    last_ch = '-' + last_ch;
+                }
+                
+                vetor[contador] = stod(last_ch);
+                last_ch = ch;
+                negativo = false;
+                contador++;
+                continue;
+            }
+            
+        }
+
+        else if (ch == '-'){
+            negativo =true;
+            continue;
+        }
+
+        else if (ch != ' '){
+            if (last_ch == " "){
+                last_ch = ch;
+                continue;
+            }
+
+            else if (last_ch != " "){
+                last_ch = last_ch + ch;
+                continue;
+            }
+        }
+    }
+    vetor[contador] = stod(last_ch);    
+}
+
+void lerMatriz(vector<vector<double>> &A, int &n, string &arquivo){
+ ifstream fin(arquivo); 
+ char ch;
+ string last_ch = " ";
+ bool negativo = false;
+ int contador, contador2 = 0;
+ vector<double> vetor(n*n,0);
+
+ while(fin.get(ch)){ 
+    if (ch == ' '){
+        if(last_ch == " " or contador2 == 0){
+            contador2++;
+            continue;
+        }
+        else if (last_ch != " "){
+            if (negativo){
+                last_ch = '-' + last_ch;
+            }
+            
+            vetor[contador] = stod(last_ch);
+            last_ch = ch;
+            negativo = false;
+            contador++;
+            continue;
+        }
+        
+    }
+
+    else if (ch == '-'){
+        negativo =true;
+        continue;
+    }
+
+    else if (ch != ' '){
+        if (last_ch == " "){
+            last_ch = ch;
+            continue;
+        }
+
+        else if (last_ch != " "){
+            last_ch = last_ch + ch;
+            continue;
+        }
+        
+
+    }
+
+    }
+
+    vetor[contador] = stod(last_ch);
+    contador = 0;
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            A[i][j] = vetor[contador];
+            contador++;
+        }
+    } 
+}
 
 
 void imprimirVetor(vector<double>&x){
@@ -227,9 +335,9 @@ vector<double> resolverSistemaCholesky(vector<vector<double>>& A, vector<vector<
 // Função principal
 int main() {
     int n, ICOD, sair;
-    
-    cout << "Digite a ordem da matriz: ";
-    cin >> n;
+    string arquivo = "Matriz_A.dat";
+    string id;
+    n = 10;
 
     // Cria as matrizes A, L e U e o vetor b
     vector<vector<double>> A(n, vector<double>(n, 0.0));
@@ -239,12 +347,9 @@ int main() {
     vector<double> x;
 
     // Lê os valores de A e b
-    cout << "Digite os valores da matriz A:\n";
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            cin >> A[i][j];
-        }
-    }
+    cout << "Lendo a matriz A... " << endl;
+    lerMatriz(A,n,arquivo);
+    cout << "Matriz A Lida: " << endl;
 
     cout << "Escolha o método de resolução (Decomposição LU (ICOD =1) ou Decomposição de Cholesky (ICOD =2)): ";
     cin >> ICOD;
@@ -252,26 +357,18 @@ int main() {
     if (ICOD == 1){
         // Executa a decomposição LU
         decomposicaoLU(A, L, U, n);
-        while (true){
-            cout << "Digite os valores do vetor b:\n";
-            for (int i = 0; i < n; i++) {
-                cin >> b[i];
-            }
+        for (int i = 1; i<= 3; i++){
+            id = to_string(i);
+            cout << "Lendo o vetor B"+id+"...\n";
+            arquivo = "Vetor_B_0"+id+".dat";
+            lerVetor(b,n,arquivo);
+            cout << "Vetor B_0"+id+" Lido : " << endl;
+            imprimirVetor(b);
 
             // Resolve o sistema linear Ax = b usando a decomposição LU
             x = resolverSistemaLU(A, L, U, b, n);
             cout << "A solução do sistema é:\n";
-            for (int i = 0; i < n; i++) {
-                cout << "x" << i + 1 << " = " << x[i] << "\n";
-            }
-
-            cout << "desaja sair ? ('1' para sim ou '0' para não) ";
-            cin >> sair;
-
-            if (sair == 1){
-                return 0;
-            }
-            
+            imprimirVetor(x);
         }
                 
     }   
@@ -279,33 +376,24 @@ int main() {
         
     else if (ICOD == 2){
         decomposicaoCholesky(A,L,n);
-        while (true){
-            cout << "Digite os valores do vetor b:\n";
-            for (int i = 0; i < n; i++) {
-                cin >> b[i];
-            }
-            // Resolve o sistema linear Ax = b usando a decomposição LU
+        for (int i = 1; i<= 3; i++){
+            id = to_string(i);
+            cout << "Lendo o vetor B_0"+id+"...\n";
+            arquivo = "Vetor_B_0"+id+".dat";
+            lerVetor(b,n,arquivo);
+            cout << "Vetor B_0"+id+" Lido:" << endl;
+            imprimirVetor(b);
+
+            // Resolve o sistema linear Ax = b usando Cholesky
             x = resolverSistemaCholesky(A,L,b,n);
             cout << "A solução do sistema é:\n";
-            for (int i = 0; i < n; i++) {
-                cout << "x" << i + 1 << " = " << x[i] << "\n";
-            }
-
-            cout << "desaja sair ? ('1' para sim ou '0' para não) ";
-            cin >> sair;
-
-            if (sair == 1){
-                return 0;
-            }
+            imprimirVetor(x);
         }
     }
 
     else if (ICOD == 3){
-        double tol;
+        double tol = 0.0001;
         int maxIter;
-
-        cout << "Qual a tolerância ? ";
-        cin >> tol;
 
         cout << "Qual a quantidade máxima de iterações desejada? ";
         cin >> maxIter;
