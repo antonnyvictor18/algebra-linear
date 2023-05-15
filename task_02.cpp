@@ -12,12 +12,11 @@ void lerVetor(vector<double> &vetor, int &n, string &arquivo){
     char ch;
     string last_ch = " ";
     bool negativo = false;
-    int contador, contador2 = 0;
+    int contador= 0;
 
     while(fin.get(ch)){ 
         if (ch == ' '){
-            if(last_ch == " " or contador2 == 0){
-                contador2++;
+            if(last_ch == " "){
                 continue;
             }
             else if (last_ch != " "){
@@ -59,13 +58,13 @@ void lerMatriz(vector<vector<double>> &A, int &n, string &arquivo){
  char ch;
  string last_ch = " ";
  bool negativo = false;
- int contador, contador2 = 0;
- vector<double> vetor(n*n,0);
+ int contador = 0;
+ int m = n*n;
+ vector<double> vetor(m,0.0);
 
  while(fin.get(ch)){ 
     if (ch == ' '){
-        if(last_ch == " " or contador2 == 0){
-            contador2++;
+        if( last_ch == " "){
             continue;
         }
         else if (last_ch != " "){
@@ -73,6 +72,7 @@ void lerMatriz(vector<vector<double>> &A, int &n, string &arquivo){
                 last_ch = '-' + last_ch;
             }
             
+            //cout << last_ch << endl;
             vetor[contador] = stod(last_ch);
             last_ch = ch;
             negativo = false;
@@ -102,23 +102,22 @@ void lerMatriz(vector<vector<double>> &A, int &n, string &arquivo){
     }
 
     }
-
     vetor[contador] = stod(last_ch);
     contador = 0;
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
             A[i][j] = vetor[contador];
             contador++;
         }
-    } 
+    }
 }
 
-
 void imprimirVetor(vector<double>&x){
-    cout << "A solução do sistema é:\n";
+    cout << "[";
     for (int i = 0; i < x.size(); i++) {
-        cout << "x" << i + 1 << " = " << x[i] << "\n";
+        cout << x[i] << ", ";
     }
+    cout << "]" << endl;
 }
 
 void imprimirMatriz(vector<vector<double>>& matriz) {

@@ -4,18 +4,35 @@
 #include <cmath>
 using namespace std;
 
+void imprimirVetor(vector<double>&x){
+    cout << "[";
+    for (int i = 0; i < x.size(); i++) {
+        cout << x[i] << ", ";
+    }
+    cout << "]" << endl;
+}
+
+void imprimirMatriz(vector<vector<double>>& matriz) {
+    int n = matriz.size();
+    int m = matriz[0].size();
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            cout << matriz[i][j] << " ";
+        }
+        cout << "\n";
+    }
+}
 
 void lerVetor(vector<double> &vetor, int &n, string &arquivo){
     ifstream fin(arquivo); 
     char ch;
     string last_ch = " ";
     bool negativo = false;
-    int contador, contador2 = 0;
+    int contador= 0;
 
     while(fin.get(ch)){ 
         if (ch == ' '){
-            if(last_ch == " " or contador2 == 0){
-                contador2++;
+            if(last_ch == " "){
                 continue;
             }
             else if (last_ch != " "){
@@ -57,13 +74,13 @@ void lerMatriz(vector<vector<double>> &A, int &n, string &arquivo){
  char ch;
  string last_ch = " ";
  bool negativo = false;
- int contador, contador2 = 0;
- vector<double> vetor(n*n,0);
+ int contador = 0;
+ int m = n*n;
+ vector<double> vetor(m,0.0);
 
  while(fin.get(ch)){ 
     if (ch == ' '){
-        if(last_ch == " " or contador2 == 0){
-            contador2++;
+        if( last_ch == " "){
             continue;
         }
         else if (last_ch != " "){
@@ -71,6 +88,7 @@ void lerMatriz(vector<vector<double>> &A, int &n, string &arquivo){
                 last_ch = '-' + last_ch;
             }
             
+            //cout << last_ch << endl;
             vetor[contador] = stod(last_ch);
             last_ch = ch;
             negativo = false;
@@ -100,35 +118,18 @@ void lerMatriz(vector<vector<double>> &A, int &n, string &arquivo){
     }
 
     }
-
     vetor[contador] = stod(last_ch);
     contador = 0;
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
             A[i][j] = vetor[contador];
             contador++;
         }
-    } 
-}
-
-
-void imprimirVetor(vector<double>&x){
-    cout << "A solução do sistema é:\n";
-    for (int i = 0; i < x.size(); i++) {
-        cout << "x" << i + 1 << " = " << x[i] << "\n";
     }
 }
 
-void imprimirMatriz(vector<vector<double>>& matriz) {
-    int n = matriz.size();
-    int m = matriz[0].size();
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; j++) {
-            cout << matriz[i][j] << " ";
-        }
-        cout << "\n";
-    }
-}
+
+
 
 vector<vector<double>> decomposicaoCholesky(vector<vector<double>>& A, vector<vector<double>>& L, int n) {
     // Calcular a decomposição de Cholesky
@@ -198,7 +199,7 @@ bool converge(vector<vector<double>>&A){
 vector<double> jacobi(vector<vector<double>>& A, vector<double>& B, double &tol, int &maxIter) {
     if(!converge(A)){
         cerr << "Matriz não converge !!" << endl;
-        return;
+        exit(1);
     }
 
     int n = A.size();
