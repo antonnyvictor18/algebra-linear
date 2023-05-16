@@ -30,7 +30,8 @@ int main() {
 
     
     while (sair){
-        cout << "Escolha o método de resolução (Decomposição LU (ICOD =1) ou Decomposição de Cholesky (ICOD =2)): ";
+        cout << "Escolha o método de resolução\n";
+        cout << "Decomposição LU (ICOD =1), Decomposição de Cholesky (ICOD =2), Procedimento iterativo Jacobi (ICOD =3) ou Procedimento iterativo Gauss-Seidel (ICOD =4)\n";
         cin >> ICOD;
         if (ICOD == 1){
             // Executa a decomposição LU
