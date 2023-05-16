@@ -3,8 +3,23 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <iomanip>
 #include <cmath>
 using namespace std;
+
+void identidade(vector<vector<double>> &P, int &n){
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i == j) {
+                P[i][j] = 1.0;
+            } 
+            else {
+                P[i][j] = 0.0;
+            }
+        }
+    }   
+}
+
 
 void imprimirVetor(vector<double>&x){
     cout << "[";
@@ -87,7 +102,7 @@ void lerMatriz(vector<vector<double>> &A, int &n, string &arquivo){
         }
         else if (last_ch != " "){
             if (negativo){
-                last_ch = '-' + last_ch;
+                last_ch = '-' + last_ch + ".0";
             }
             
             //cout << last_ch << endl;
@@ -176,21 +191,14 @@ vector<vector<double>> decomposicaoCholesky(vector<vector<double>>& A, vector<ve
 }
 
 // Função para decompor a matriz A em L e U
-void decomposicaoLU(vector<vector<double>>& A, vector<vector<double>>& L, vector<vector<double>>& U, int n) {
-    // Inicializa L com a matriz identidade e U com a matriz A
-    for (int i = 0; i < n; i++) {
-        L[i][i] = 1.0;
-        for (int j = 0; j < n; j++) {
-            U[i][j] = A[i][j];
-        }
-    }
-
+void decomposicaoLU(vector<vector<double>>& A, vector<vector<double>>& L, int n) {
     // Executa o processo de eliminação de gauss para obter L e U
     for (int k = 0; k < n; k++) {
+        L[k][k] = 1.0;
         for (int i = k + 1; i < n; i++) {
-            L[i][k] = U[i][k] / U[k][k];
+            L[i][k] = A[i][k] / A[k][k];
             for (int j = k; j < n; j++) {
-                U[i][j] = U[i][j] - L[i][k] * U[k][j];
+                A[i][j] = A[i][j] - L[i][k] * A[k][j];
             }
         }
     }
@@ -245,7 +253,9 @@ vector<double> jacobi(vector<vector<double>>& A, vector<double>& B, double &tol,
             Xnew[i] = (B[i] - soma) / A[i][i];
         }
 
-        residuo, numerador, denominador = 0.0;
+        residuo = 0;
+        numerador = 0;
+        denominador = 0.0;
         for (int i = 0; i < n; i++) {
             numerador += pow(Xnew[i] - Xold[i], 2);
             denominador += pow(Xnew[i],2);
@@ -263,25 +273,28 @@ vector<double> jacobi(vector<vector<double>>& A, vector<double>& B, double &tol,
 }
 
 
-vector<double> gauss_seidel(vector<vector<double>> &A, vector<double> &B, double &tol, int &maxIter) {
+vector<double> gauss_seidel(vector<vector<double>> &A, vector<double> &B, double &tol) {
     int n = A.size();
     int iter = 0; // número de iterações
-    vector<double> Xold(n, 1);// estimativa inicial da solução
-    vector<double> Xnew(n, 0); 
+    vector<double> Xold(n, 1.0);// estimativa inicial da solução
+    vector<double> Xnew(n, 0.0); 
     double residuo = tol + 1; // residuo inicial (qualquer valor maior que tol)
     double numerador,denominador;
 
-    while (residuo > tol && iter < maxIter) {
-        residuo, numerador, denominador = 0.0;
+    while (residuo > tol) {
+        numerador = 0.0;
+        denominador = 0.0;
         for (int i = 0; i < n; i++) {
             double soma = 0;
             for (int j = 0; j <= i-1; j++) {
-                    soma += A[i][j] * Xnew[j];
+                soma += A[i][j] * Xnew[j];
             }
 
             for (int j = i + 1; j < n; j++){
+                //cout << "passou no 2 quando o i era " << i << " e o j era " << j <<endl;
                 soma += A[i][j] * Xold[j];
             }
+
 
             Xnew[i] = (B[i] - soma)/A[i][i];  // nova estimativa da solução
             numerador += pow(Xnew[i] - Xold[i], 2);
@@ -293,11 +306,9 @@ vector<double> gauss_seidel(vector<vector<double>> &A, vector<double> &B, double
             iter++; // incrementa o número de iterações
         }
     // verifica se o método convergiu ou não
-    if (iter == maxIter && residuo > tol) {
-        cerr << "O método de Gauss-Seidel não convergiu em " << maxIter << " iterações." << endl;
-    }
+    cout << "O método de Gauss-Seidel convergiu em " << iter << " iterações." << endl;
 
-    return Xnew;
+    return Xold;
 }
 
 
@@ -307,7 +318,7 @@ vector<double> gauss_seidel(vector<vector<double>> &A, vector<double> &B, double
 
 
 // Função para resolver o sistema linear Ax = b usando a decomposição LU
-vector<double> resolverSistemaLU(vector<vector<double>>& A, vector<vector<double>>& L, vector<vector<double>>& U, vector<double>& b, int n) {
+vector<double> resolverSistemaLU(vector<vector<double>>& A, vector<vector<double>>& L, vector<double>& b, int n) {
     // Encontra a solução de Ly = b
     vector<double> y(n, 0.0);
     for (int i = 0; i < n; i++) {
@@ -323,9 +334,9 @@ vector<double> resolverSistemaLU(vector<vector<double>>& A, vector<vector<double
     for (int i = n - 1; i >= 0; i--) {
         double soma = 0.0;
         for (int j = i + 1; j < n; j++) {
-            soma += U[i][j] * x[j];
+            soma += A[i][j] * x[j];
         }
-        x[i] = (y[i] - soma) / U[i][i];
+        x[i] = (y[i] - soma) / A[i][i];
     }
 
     return x;
@@ -381,8 +392,8 @@ double maxElemento(vector<vector<double>>&A, int& p, int& q) {
     int n = A.size();
     for (int i = 0; i < n; i++) {
         for (int j = i+1; j < n; j++) {
-            if (fabs(A[i][j]) > max) {
-                max = fabs(A[i][j]);
+            if (abs(A[i][j]) > max) {
+                max = abs(A[i][j]);
                 p = i;
                 q = j;
             }
@@ -401,58 +412,68 @@ double anguloRotacao(vector<vector<double>>&A, int &p, int &q) {
     }
 }
 
-
-// Função para fazer a rotação de Jacobi
-void rotacaoJacobi(vector<vector<double>>&A, vector<vector<double>>&V, int &p, int &q) {
-    int n = A.size();
-    double c = cos(anguloRotacao(A,p,q));
-    double s = sin(anguloRotacao(A,p,q));
-    double Apq = A[p][q];
-    double App = A[p][p];
-    double Aqq = A[q][q];
-    double Appn = App*c*c + Aqq*s*s - 2.0*Apq*c*s;
-    double Aqqn = App*s*s + Aqq*c*c + 2.0*Apq*c*s;
-    A[p][p] = Appn;
-    A[q][q] = Aqqn;
-    A[p][q] = 0.0;
-    A[q][p] = 0.0;
+void transporMatriz(vector<vector<double>>& matriz, vector<vector<double>>& matrizTransposta, int &n) {
+   
     for (int i = 0; i < n; i++) {
-        if (i != p && i != q) {
-            double Aip = A[i][p];
-            double Aiq = A[i][q];
-            A[i][p] = Aip*c - Aiq*s;
-            A[p][i  ] = A[i][p];
-            A[i][q] = Aiq*c + Aip*s;
-            A[q][i] = A[i][q];
+        for (int j = 0; j < n; j++) {
+            matrizTransposta[j][i] = matriz[i][j];
         }
-        double Vip = V[i][p];
-        double Viq = V[i][q];
-        V[i][p] = Vip*c - Viq*s;
-        V[i][q] = Viq*c + Vip*s;
     }
 }
 
-// Função para calcular os autovalores e autovetores
-void jacobi(vector<vector<double>>&A, vector<vector<double>>&V) {
-    int n = A.size();
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            if (i == j) {
-                V[i][j] = 1.0;
-            // Inicializar a matriz V como a matriz identidade
-            } 
-            else {
-                V[i][j] = 0.0;
+void prodMatMat(vector<vector<double>> &X, vector<vector<double>> &P, int &n){
+    vector<vector<double>> multi(n, vector<double>(n));    
+    for(int i =0; i<n; i++){
+        for(int j =0; j<n;j++){
+            multi[i][j] = 0.0;
+            for(int k = 0; k<n; k++){
+                multi[i][j] += X[i][k] * P[k][j]; 
             }
         }
     }
-    int p, q;
-    double max = maxElemento(A, p, q);
-    while (max > 1e-10) { // Critério de parada
-        rotacaoJacobi(A, V, p, q);
-        max = maxElemento(A, p, q);
+    X = multi;
+}
+
+void prodMatMatMat(vector<vector<double>> &P_trans, vector<vector<double>> &A,vector<vector<double>> &P, int &n){
+    vector<vector<double>> multi(n, vector<double>(n));    
+    for(int i =0; i<n; i++){
+        for(int j =0; j<n;j++){
+            multi[i][j] = 0.0;
+            for(int k = 0; k<n; k++){
+                multi[i][j] += P_trans[i][k] * A[k][j]; 
+            }
+            
+        }
+    }
+
+    for(int i =0; i<n; i++){
+        for(int j =0; j<n;j++){
+            A[i][j] = 0.0;
+            for(int k = 0; k<n; k++){
+                A[i][j] += multi[i][k] * P[k][j]; 
+            }
+    
+        }
     }
 }
+
+
+
+// Função para fazer a rotação de Jacobi
+void rotacaoJacobi(vector<vector<double>>&A, vector<vector<double>>&P, vector<vector<double>>&P_trans, vector<vector<double>>&X, int &p, int &q, int &n) {
+    double angulo = anguloRotacao(A,p,q);
+    double c = cos(angulo);
+    double s = sin(angulo);
+    P[p][p] = c;
+    P[q][q] = c;
+    P[p][q] = -s;
+    P[q][p] = s;
+    transporMatriz(P,P_trans,n);
+    prodMatMatMat(P_trans,A,P,n);
+    prodMatMat(X,P,n);
+}
+
+
 
 
 // função que divide um vetor por um escalar
