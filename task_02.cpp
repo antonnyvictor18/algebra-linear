@@ -5,12 +5,11 @@
 #include "utils.h"
 using namespace std;
 
-double tol = 0.01; // valor de tolerância para o critério de parada
-
 
 int main() {
     int ICOD, iter;
     int n = 10;
+    double tol;
     string arquivo = "Matriz_A.dat";
     vector<vector<double>> A(n, vector<double>(n));
 
@@ -22,19 +21,22 @@ int main() {
     cout << "Escolha o método de resolução (Metodo da Potência -> 1 ou Método de Jacobi -> 2): ";
     cin >> ICOD;
 
+    cout << "Escolha uma tolerância (Entre com um valor de ponto flutuante entre 0 e 1): ";
+    cin >> tol;
+
     if (ICOD == 1){
         iter = 0;
         vector<double> x(n, 1.0);
         vector<double> y(n,0.0); 
         double lambda = 1;
-        double lambda_ant; // autovalor atual e autovalor anterior
+        double lambda_ant; 
         do {
             lambda_ant = lambda;
             y = prodMatVec(A, x);
             lambda = normaMaiorValor(y);
             x = divVec(lambda,y);
             iter++;
-        } while (abs((lambda - lambda_ant)/lambda) > tol); // critério de parada
+        } while (abs((lambda - lambda_ant)/lambda) > tol); 
             
         cout << "Número de iterações: " << iter << endl;
         cout << "Autovalor: " << lambda << endl;

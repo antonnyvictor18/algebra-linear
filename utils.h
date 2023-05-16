@@ -229,13 +229,12 @@ bool converge(vector<vector<double>>&A){
     return true;
 }
 // Função que calcula a solução do sistema linear Ax = B usando o método iterativo de Jacobi
-vector<double> jacobi(vector<vector<double>>& A, vector<double>& B, double &tol, int &maxIter) {
+vector<double> jacobi(vector<vector<double>>& A, vector<double>& B, int &n, double &tol, int &maxIter) {
     if(!converge(A)){
         cerr << "Matriz não converge !!" << endl;
         exit(1);
     }
 
-    int n = A.size();
     int k = 0;
     vector<double> Xold(n, 1.0);
     vector<double> Xnew(n, 0.0);
@@ -273,8 +272,7 @@ vector<double> jacobi(vector<vector<double>>& A, vector<double>& B, double &tol,
 }
 
 
-vector<double> gauss_seidel(vector<vector<double>> &A, vector<double> &B, double &tol) {
-    int n = A.size();
+vector<double> gauss_seidel(vector<vector<double>> &A, vector<double> &B, int &n, double &tol) {
     int iter = 0; // número de iterações
     vector<double> Xold(n, 1.0);// estimativa inicial da solução
     vector<double> Xnew(n, 0.0); 
@@ -472,9 +470,6 @@ void rotacaoJacobi(vector<vector<double>>&A, vector<vector<double>>&P, vector<ve
     prodMatMatMat(P_trans,A,P,n);
     prodMatMat(X,P,n);
 }
-
-
-
 
 // função que divide um vetor por um escalar
 vector<double> divVec(double &lambda, vector<double>&y) {
