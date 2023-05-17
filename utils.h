@@ -310,7 +310,13 @@ vector<double> gauss_seidel(vector<vector<double>> &A, vector<double> &B, int &n
 }
 
 
-
+double det(vector<vector<double>> &A, int &n){
+    double determinante = 1;
+    for(int i =0; i<n;i++){
+      determinante *= A[i][i];   
+    }
+    return determinante;
+}
 
 
 

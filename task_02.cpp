@@ -47,7 +47,7 @@ int main() {
     else if (ICOD == 2){
         iter = 0;
         int p, q;
-        double max;
+        double max, determinante;
         vector<vector<double>> P(n, vector<double>(n));
         vector<vector<double>> P_trans(n, vector<double>(n));
         vector<vector<double>> X(n, vector<double>(n));
@@ -76,6 +76,8 @@ int main() {
         imprimirMatriz(A);
         cout << "Matriz com Autovetores: "<<endl;
         imprimirMatriz(X);
+        cout << "Determinante de A: " << det(A,n) << endl;
+
         
     }
     return 0;
