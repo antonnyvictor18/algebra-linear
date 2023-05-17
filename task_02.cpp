@@ -47,7 +47,7 @@ int main() {
     else if (ICOD == 2){
         iter = 0;
         int p, q;
-        double max, determinante;
+        double max;
         vector<vector<double>> P(n, vector<double>(n));
         vector<vector<double>> P_trans(n, vector<double>(n));
         vector<vector<double>> X(n, vector<double>(n));
