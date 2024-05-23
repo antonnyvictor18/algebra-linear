@@ -11,7 +11,7 @@ int main() {
     int n, ICOD, maxIter;
     double tol;
     int sair  = 1;
-    string arquivo = "Matriz_A.dat";
+    string arquivo = "data/Matriz_A.dat";
     string id;
     n = 10;
 
@@ -40,7 +40,7 @@ int main() {
             for (int i = 1; i<= 3; i++){
                 id = to_string(i);
                 cout << "Lendo o vetor B"+id+"...\n";
-                arquivo = "Vetor_B_0"+id+".dat";
+                arquivo = "data/Vetor_B_0"+id+".dat";
                 lerVetor(b,n,arquivo);
                 cout << "Vetor B_0"+id+" Lido : " << endl;
                 imprimirVetor(b);
@@ -59,7 +59,7 @@ int main() {
             for (int i = 1; i<= 3; i++){
                 id = to_string(i);
                 cout << "Lendo o vetor B_0"+id+"...\n";
-                arquivo = "Vetor_B_0"+id+".dat";
+                arquivo = "data/Vetor_B_0"+id+".dat";
                 lerVetor(b,n,arquivo);
                 cout << "Vetor B_0"+id+" Lido:" << endl;
                 imprimirVetor(b);
@@ -84,7 +84,7 @@ int main() {
             for (int i = 1; i<= 3; i++){
                 id = to_string(i);
                 cout << "Lendo o vetor B_0"+id+"...\n";
-                arquivo = "Vetor_B_0"+id+".dat";
+                arquivo = "data/Vetor_B_0"+id+".dat";
                 lerVetor(b,n,arquivo);
                 cout << "Vetor B_0"+id+" Lido:" << endl;
                 imprimirVetor(b);
@@ -107,7 +107,7 @@ int main() {
             for (int i = 1; i<= 3; i++){
                 id = to_string(i);
                 cout << "Lendo o vetor B_0"+id+"...\n";
-                arquivo = "Vetor_B_0"+id+".dat";
+                arquivo = "data/Vetor_B_0"+id+".dat";
                 lerVetor(b,n,arquivo);
                 cout << "Vetor B_0"+id+" Lido:" << endl;
                 imprimirVetor(b);
