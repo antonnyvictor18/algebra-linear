@@ -10,7 +10,7 @@ int main() {
     int ICOD, iter;
     int n = 10;
     double tol;
-    string arquivo = "Matriz_A.dat";
+    string arquivo = "data/Matriz_A.dat";
     vector<vector<double>> A(n, vector<double>(n));
 
     cout << "Lendo a Matriz A:" << endl;
